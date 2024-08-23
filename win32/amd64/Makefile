@@ -14,14 +14,15 @@ OBJS=$(addsuffix .o,$(OBJBASE) $(RESBASE))
 OBJS+=$(addsuffix .sse.o,$(SSEOBJBASE))
 ARCH=x86_64
 PREFIX=$(ARCH)-w64-mingw32-
-CC=$(PREFIX)gcc
-WINDRES=$(PREFIX)windres
-STRIP=$(PREFIX)strip
-CFLAGS=-std=c99 -O2 -Wall -Werror -Wextra -pedantic -I../.. \
-       $(addprefix -D,$(DEFINES))
+CC=gcc
+WINDRES=windres
+STRIP=strip
+CFLAGS=-std=c99 -O2 -Wall -Wextra -pedantic -I../.. \
+	$(addprefix -D,$(DEFINES))
 SSECFLAGS=-mssse3 -O3
 LIBS=-mwindows -municode \
-     $(addprefix -l,$(LIBBASE))
+	$(addprefix -l,$(LIBBASE))
+VERSION=`dd bs=6 status=none if=../../versionprint.txt`
 
 $(TARGET):	$(OBJS)
 	@echo "  CCLD     $@"
@@ -40,8 +41,9 @@ $(TARGET):	$(OBJS)
 	@echo "  WINDRES  $@"
 	@$(WINDRES) -o $@ -i $<
 
-$(MANIFEST):    $(MANIFEST).in ../../version.h
-	sed -e "s/@VER@/$(shell ../../versionprint.c)/g" $< > $@
+$(MANIFEST):	$(MANIFEST).in ../../versionprint.txt
+	@echo "  VERSION  $(VERSION)"
+	sed -e "s/@VER@/$(VERSION)/g" $< > $@
 
 $(ICON):	$(ICONFILES)
 	icotool -o $@ -c $^

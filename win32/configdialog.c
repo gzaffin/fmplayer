@@ -340,7 +340,7 @@ static bool on_create(HWND hwnd, const CREATESTRUCT *cs) {
   return true;
 }
 
-static void on_activate(HWND hwnd, bool activate, HWND targetwnd, WINBOOL state) {
+static void on_activate(HWND hwnd, bool activate, HWND targetwnd, bool state) {
   (void)targetwnd;
   (void)state;
   if (activate) g_currentdlg = hwnd;
