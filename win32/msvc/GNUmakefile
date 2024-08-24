@@ -61,9 +61,9 @@ clean:
 	@echo   $(SSE2_SUPPORTED)
 	del $(TARGET) $(OBJS) $(MANIFEST)
 
-build_dependences: ..\..\InstructionSet.exe ..\..\versionprint.exe
+build_dependency: ..\..\InstructionSet.exe ..\..\versionprint.exe
 
-clean_dependences:
+clean_dependency:
 	del ..\..\InstructionSet.exe ..\..\versionprint.exe
 
 ..\..\InstructionSet.exe: ..\..\InstructionSet.cpp
@@ -75,4 +75,4 @@ clean_dependences:
 clean_objs:
 	del $(OBJS) InstructionSet.obj versionprint.obj
 
-.PHONY: build_dependences clean_dependences clean_objs
+.PHONY: build_dependency clean_dependency clean_objs
