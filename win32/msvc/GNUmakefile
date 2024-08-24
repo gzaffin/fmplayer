@@ -12,7 +12,7 @@ WINDOWS_OS_MSVC = 1
 ICOTOOL_PATH=C:/Users/gzaff/Devs/png2ico/build/Release
 ICOTOOL=png2ico.exe
 
-VERSION=$(shell TYPE ..\..\versionprint.txt)
+VERSION=$(shell ..\..\versionprint.exe)
 SSE2_SUPPORTED=$(shell .\..\..\InstructionSet.exe | sed -n "/^SSE2 supported/p")
 
 include ../fmplayer.mak
@@ -60,3 +60,19 @@ clean:
 	@echo   VERSION  $(VERSION)
 	@echo   $(SSE2_SUPPORTED)
 	del $(TARGET) $(OBJS) $(MANIFEST)
+
+build_dependences: ..\..\InstructionSet.exe ..\..\versionprint.exe
+
+clean_dependences:
+	del ..\..\InstructionSet.exe ..\..\versionprint.exe
+
+..\..\InstructionSet.exe: ..\..\InstructionSet.cpp
+	@$(CC) $< /Fe$@ /W4
+
+..\..\versionprint.exe: ..\..\versionprint.c
+	@$(CC) $< /Fe$@ /W4
+
+clean_objs:
+	del $(OBJS) InstructionSet.obj versionprint.obj
+
+.PHONY: build_dependences clean_dependences clean_objs
