@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
 #define GL_GLEXT_PROTOTYPES
 #include <GL/glcorearb.h>
+#include <gdk/gdkx.h>
 #include <stdlib.h>
 #include <string.h>
 #include "oscilloview.h"
@@ -160,12 +161,12 @@ void show_oscilloview(void) {
   if (!g.win) {
     g.win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(g.win), "Oscilloscope view");
-    g_signal_connect(g.win, "destroy", G_CALLBACK(on_destroy), 0);
+    g_signal_connect(G_OBJECT (g.win), "destroy", G_CALLBACK(on_destroy), 0);
     GtkWidget *glarea = gtk_gl_area_new();
     g_signal_connect(G_OBJECT(glarea), "unrealize", G_CALLBACK(on_glarea_unrealize), 0);
     gtk_gl_area_set_required_version(GTK_GL_AREA(glarea), 3, 2);
-    g_signal_connect(glarea, "render", G_CALLBACK(on_render), 0);
-    g_signal_connect(glarea, "realize", G_CALLBACK(on_realize), 0);
+    g_signal_connect(G_OBJECT (glarea), "render", G_CALLBACK(on_render), 0);
+    g_signal_connect(G_OBJECT (glarea), "realize", G_CALLBACK(on_realize), 0);
     gtk_container_add(GTK_CONTAINER(g.win), glarea);
     gtk_widget_add_tick_callback(glarea, tick_cb, 0, 0);
     gtk_widget_show_all(g.win);

@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -242,13 +243,13 @@ static GtkWidget *create_menubar() {
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), menu);
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), file);
   GtkWidget *open = gtk_menu_item_new_with_label("Open");
-  //g_signal_connect(open, "activate", G_CALLBACK(on_menu_open), 0);
+  //g_signal_connect(G_OBJECT (open), "activate", G_CALLBACK(on_menu_open), 0);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), open);
   GtkWidget *save = gtk_menu_item_new_with_label("Save wavefile");
-  g_signal_connect(save, "activate", G_CALLBACK(on_menu_save), 0);
+  g_signal_connect(G_OBJECT (save), "activate", G_CALLBACK(on_menu_save), 0);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), save);
   GtkWidget *quit = gtk_menu_item_new_with_label("Quit");
-  g_signal_connect(quit, "activate", G_CALLBACK(on_menu_quit), 0);
+  g_signal_connect(G_OBJECT (quit), "activate", G_CALLBACK(on_menu_quit), 0);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), quit);
 
   GtkWidget *window = gtk_menu_item_new_with_label("Window");
@@ -256,13 +257,13 @@ static GtkWidget *create_menubar() {
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(window), filemenu);
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), window);
   GtkWidget *toneview = gtk_menu_item_new_with_label("Tone view");
-  g_signal_connect(toneview, "activate", G_CALLBACK(on_tone_view), 0);
+  g_signal_connect(G_OBJECT (toneview), "activate", G_CALLBACK(on_tone_view), 0);
   gtk_menu_shell_append(GTK_MENU_SHELL(filemenu), toneview);
   GtkWidget *oscilloview = gtk_menu_item_new_with_label("Oscillo view");
-  g_signal_connect(oscilloview, "activate", G_CALLBACK(on_oscillo_view), 0);
+  g_signal_connect(G_OBJECT (oscilloview), "activate", G_CALLBACK(on_oscillo_view), 0);
   gtk_menu_shell_append(GTK_MENU_SHELL(filemenu), oscilloview);
   GtkWidget *config = gtk_menu_item_new_with_label("Config");
-  g_signal_connect(config, "activate", G_CALLBACK(on_config), 0);
+  g_signal_connect(G_OBJECT (config), "activate", G_CALLBACK(on_config), 0);
   gtk_menu_shell_append(GTK_MENU_SHELL(filemenu), config);
   return menubar;
 }
@@ -541,6 +542,11 @@ int main(int argc, char **argv) {
   fft_init_table();
   fmplayer_font_rom_load(&g.font98);
   gtk_init(&argc, &argv);
+
+  g_print("GTK+ version: %d.%d.%d\n", gtk_major_version,
+          gtk_minor_version, gtk_micro_version);
+  g_print("Glib version: %d.%d.%d\n", glib_major_version,
+          glib_minor_version, glib_micro_version);
   {
     GList *iconlist = 0;
     iconlist = g_list_append(iconlist, gdk_pixbuf_new_from_xpm_data(fmplayer_xpm_16));
@@ -552,7 +558,7 @@ int main(int argc, char **argv) {
   g.mainwin = w;
   gtk_window_set_resizable(GTK_WINDOW(w), FALSE);
   gtk_window_set_title(GTK_WINDOW(w), "98FMPlayer");
-  g_signal_connect(w, "destroy", G_CALLBACK(on_destroy), 0);
+  g_signal_connect(G_OBJECT (w), "destroy", G_CALLBACK(on_destroy), NULL);
   g.root_box_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_container_add(GTK_CONTAINER(w), g.root_box_widget);
 
@@ -568,33 +574,33 @@ int main(int argc, char **argv) {
 #ifdef PACC_GL_ES
   gtk_gl_area_set_use_es(GTK_GL_AREA(g.fmdsp_widget), TRUE);
 #ifdef PACC_GL_3
-  gtk_gl_area_set_required_version(GTK_GL_AREA(g.fmdsp_widget), 2, 0);
+  gtk_gl_area_set_required_version(GTK_GL_AREA(g.fmdsp_widget), 3, 0);
 #else
   gtk_gl_area_set_required_version(GTK_GL_AREA(g.fmdsp_widget), 2, 0);
 #endif
 #else // PACC_GL_ES
 #ifdef PACC_GL_3
-  gtk_gl_area_set_required_version(GTK_GL_AREA(g.fmdsp_widget), 3, 2);
+  gtk_gl_area_set_required_version(GTK_GL_AREA(g.fmdsp_widget), 3, 0);
 #else
-  gtk_gl_area_set_required_version(GTK_GL_AREA(g.fmdsp_widget), 2, 0);
+  gtk_gl_area_set_required_version(GTK_GL_AREA(g.fmdsp_widget), 2, 1);
 #endif
 #endif // PACC_GL_ES
   gtk_widget_add_tick_callback(g.fmdsp_widget, tick_cb, 0, 0);
-  g_signal_connect(g.fmdsp_widget, "render", G_CALLBACK(render_cb), 0);
-  g_signal_connect(g.fmdsp_widget, "realize", G_CALLBACK(realize_cb), 0);
-  g_signal_connect(g.fmdsp_widget, "unrealize", G_CALLBACK(unrealize_cb), 0);
+  g_signal_connect(G_OBJECT (g.fmdsp_widget), "render", G_CALLBACK(render_cb), 0);
+  g_signal_connect(G_OBJECT (g.fmdsp_widget), "realize", G_CALLBACK(realize_cb), 0);
+  g_signal_connect(G_OBJECT (g.fmdsp_widget), "unrealize", G_CALLBACK(unrealize_cb), 0);
 
   g.filechooser_widget = gtk_file_chooser_widget_new(GTK_FILE_CHOOSER_ACTION_OPEN);
-  g_signal_connect(g.filechooser_widget, "file-activated", G_CALLBACK(on_file_activated), 0);
+  g_signal_connect(G_OBJECT (g.filechooser_widget), "file-activated", G_CALLBACK(on_file_activated), NULL);
 
   create_box();
 
-  g_signal_connect(w, "key-press-event", G_CALLBACK(key_press_cb), 0);
+  g_signal_connect(G_OBJECT (w), "key-press-event", G_CALLBACK(key_press_cb), NULL);
   gtk_drag_dest_set(
     w, GTK_DEST_DEFAULT_MOTION|GTK_DEST_DEFAULT_HIGHLIGHT|GTK_DEST_DEFAULT_DROP,
     0, 0, GDK_ACTION_COPY);
   gtk_drag_dest_add_uri_targets(w);
-  g_signal_connect(w, "drag-data-received", G_CALLBACK(drag_data_recv_cb), 0);
+  g_signal_connect(G_OBJECT (w), "drag-data-received", G_CALLBACK(drag_data_recv_cb), NULL);
   gtk_widget_add_events(w, GDK_KEY_PRESS_MASK);
   gtk_widget_show_all(w);
   gtk_main();

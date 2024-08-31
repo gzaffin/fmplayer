@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>
 #include <cairo.h>
 #include "oscilloview.h"
 #include <string.h>
@@ -72,10 +73,10 @@ void show_oscilloview(void) {
   if (!g.win) {
     g.win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(g.win), "Oscilloscope view");
-    g_signal_connect(g.win, "destroy", G_CALLBACK(on_destroy), 0);
+    g_signal_connect(G_OBJECT (g.win), "destroy", G_CALLBACK(on_destroy), 0);
     GtkWidget *drawarea = gtk_drawing_area_new();
     gtk_container_add(GTK_CONTAINER(g.win), drawarea);
-    g_signal_connect(drawarea, "draw", G_CALLBACK(draw_cb), 0);
+    g_signal_connect(G_OBJECT (drawarea), "draw", G_CALLBACK(draw_cb), 0);
     gtk_widget_add_tick_callback(drawarea, tick_cb, 0, 0);
     gtk_widget_show_all(g.win);
   } else {

@@ -1,4 +1,7 @@
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>
+#include <EGL/egl.h>
+#include <GL/gl.h>
 #include "toneview.h"
 #include <stdatomic.h>
 #include <stdbool.h>
@@ -90,7 +93,7 @@ void show_toneview(void) {
     g.tonewin = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_container_set_border_width(GTK_CONTAINER(g.tonewin), 5);
     gtk_window_set_title(GTK_WINDOW(g.tonewin), "FM Tone Viewer");
-    g_signal_connect(g.tonewin, "destroy", G_CALLBACK(on_destroy), 0);
+    g_signal_connect(G_OBJECT (g.tonewin), "destroy", G_CALLBACK(on_destroy), 0);
     GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_container_add(GTK_CONTAINER(g.tonewin), box);
     GtkWidget *ctrlbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
@@ -101,11 +104,11 @@ void show_toneview(void) {
     gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(format), "FMP");
     gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(format), "VOPM");
     gtk_combo_box_set_active(GTK_COMBO_BOX(format), g.format);
-    g_signal_connect(format, "changed", G_CALLBACK(on_format_changed), 0);
+    g_signal_connect(G_OBJECT (format), "changed", G_CALLBACK(on_format_changed), 0);
     GtkWidget *normalizecheck = gtk_check_button_new_with_label("Normalize");
     gtk_box_pack_start(GTK_BOX(ctrlbox), normalizecheck, FALSE, TRUE, 0);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(normalizecheck), g.normalize);
-    g_signal_connect(normalizecheck, "toggled", G_CALLBACK(on_normalize_toggled), 0);
+    g_signal_connect(G_OBJECT (normalizecheck), "toggled", G_CALLBACK(on_normalize_toggled), 0);
     for (int c = 0; c < 6; c++) {
       GtkWidget *cbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
       gtk_box_pack_start(GTK_BOX(box), cbox, TRUE, TRUE, 0);
@@ -117,7 +120,7 @@ void show_toneview(void) {
       pango_attr_list_unref(pattrl);
       gtk_box_pack_start(GTK_BOX(cbox), tonetext, TRUE, TRUE, 0);
       GtkWidget *copybutton = gtk_button_new_with_label("Copy");
-      g_signal_connect(copybutton, "clicked", G_CALLBACK(on_copy_clicked), (gpointer)((intptr_t)c));
+      g_signal_connect(G_OBJECT (copybutton), "clicked", G_CALLBACK(on_copy_clicked), (gpointer)((intptr_t)c));
       gtk_box_pack_start(GTK_BOX(cbox), copybutton, FALSE, TRUE, 0);
       g.label[c] = tonetext;
     }
